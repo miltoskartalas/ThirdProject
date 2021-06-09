@@ -248,7 +248,7 @@ void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
   string virusName = "";
   while (true) {
     virusName = readStringClient(fdList, bfSize, monID);
-    cout << "Travel Monitor got " << virusName << endl;
+    // cout << "Travel Monitor got " << virusName << endl;
     if (virusName == "") {
       return;
     }
@@ -287,7 +287,7 @@ string readStringClient(FileDescriptorList *fdList, int bufferSize, int MonID) {
   int transportSize = bufferSize;
 
   int sizeOfWholeStr = readIntClient(fdList, MonID);
-  cout << "size of whole str " << sizeOfWholeStr << endl;
+
   if (sizeOfWholeStr == -1) {
 
     return "";

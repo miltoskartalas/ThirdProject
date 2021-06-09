@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
 
   while (virus != nullptr) {
     string sentVirus = *(virus->getVirusName());
-    cout << "Sending " << sentVirus << endl;
+    // cout << "Sending " << sentVirus << endl;
     sentStringServer(sentVirus, socketBufferSize, socketFromAcc);
 
     int intsOfBloom = sizeOfBloom / sizeof(int);
