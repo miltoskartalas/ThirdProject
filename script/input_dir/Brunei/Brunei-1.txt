@@ -1,0 +1,4 @@
+2327 vPRlKFetFrQQ bSmQzCFOoMhZ Brunei 47 H1N1 YES 13-6-1998
+3787 tEaTCgyrqi ijGkOQEktS Brunei 62 Adenovirus NO
+3787 tEaTCgyrqi ijGkOQEktS Brunei 62 H1N1 NO
+8484 bWlWKMnbp AZubsDzNKaJo Brunei 22 Typhus YES 15-12-1985

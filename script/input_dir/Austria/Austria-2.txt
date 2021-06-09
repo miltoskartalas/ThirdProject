@@ -1,0 +1,3 @@
+9752 VAatf YBAeNt Austria 30 Smallpox YES 29-12-1971
+5234 Alwx BBEy Austria 87 Adenovirus YES 25-1-2020
+5234 Alwx BBEy Austria 87 H1N1 NO
