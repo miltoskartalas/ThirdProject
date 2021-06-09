@@ -157,28 +157,19 @@ int main(int argc, char **argv) {
     cout << "Sending " << sentVirus << endl;
     sentStringServer(sentVirus, socketBufferSize, socketFromAcc);
 
-    int ptr = 0;
     int intsOfBloom = sizeOfBloom / sizeof(int);
-    int intsOfBuff = socketBufferSize / sizeof(int);
+    int leftovers = sizeOfBloom % sizeof(int);
+    int i;
     int *BloomArray = virus->getBloomFilter()->getBloomArray();
 
-    for (int i = 0; i < sizeOfBloom / socketBufferSize; i++) {
-
-      // cout << "Sending process : " << i << " of " << sizeOfBloom /
-      // socketBufferSize << endl;
-      for (int i = ptr; i < ptr + intsOfBuff; i++) {
-
-        sentIntServer(BloomArray[i], socketFromAcc);
-      }
-      ptr += intsOfBuff;
+    for (i = 0; i < intsOfBloom; i++) {
+      sentIntServer(BloomArray[i], socketFromAcc);
     }
-    for (int i = ptr; i < ptr + intsOfBloom % socketBufferSize; i++) {
-
+    if (leftovers > 0) {
       sentIntServer(BloomArray[i], socketFromAcc);
     }
     virus = virus->next;
   }
-
   sentIntServer(-1, socketFromAcc);
 
   readIntServer(socketFromAcc);

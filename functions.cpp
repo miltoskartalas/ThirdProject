@@ -261,36 +261,24 @@ void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
       BloomFilters->addBloomNode(virusName, filter);
     }
 
-    int pos = 0;
     int intsOfBloom = sizeOfBloom / sizeof(int);
-    int intsOfBuff = bufferSize / sizeof(int);
+
     int *bloomF = BloomFilters->searchInBloomList(virusName)
                       ->getFilter()
                       ->getBloomArray();
-    int limit = sizeOfBloom / bufferSize;
-    int modLimit = pos + intsOfBloom % bufferSize;
-    for (int i = 0; i < limit; i++) {
-      // /cout << "Reading process  : " << i << " of " << limit << endl;
+    int leftovers = sizeOfBloom % sizeof(int);
+    int i;
+    for (i = 0; i < intsOfBloom; i++) {
 
-      int Bloom[intsOfBuff];
-      for (int k = 0; k < intsOfBuff; k++) {
-        Bloom[k] = readIntClient(fdList, monID);
-      }
-      for (int j = 0; j < intsOfBuff; j++) {
-        bloomF[pos + j] = bloomF[pos + j] | Bloom[j];
-      }
-      pos += intsOfBuff;
+      int bloomInt = readIntClient(fdList, monID);
+      bloomF[i] = bloomF[i] | bloomInt;
     }
-    int Bloom[intsOfBuff];
-    for (int i = pos; i < modLimit; i++) {
-      Bloom[i - pos] = readIntClient(fdList, monID);
-    }
-    for (int j = 0; j < modLimit; j++) {
-      bloomF[pos + j] = bloomF[pos + j] | Bloom[j];
+    if (leftovers > 0) {
+      int bloomIntLeft = readIntClient(fdList, monID);
+      bloomF[i] = bloomF[i] | bloomIntLeft;
     }
   }
 }
-
 string readStringClient(FileDescriptorList *fdList, int bufferSize, int MonID) {
 
   int sock = fdList->getFileDescriptor(MonID);
