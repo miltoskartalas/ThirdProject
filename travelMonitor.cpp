@@ -154,20 +154,19 @@ int main(int argc, char **argv) {
             BloomFilters->searchInBloomList(VirusName)->getFilter();
 
         if (bloomF->checkBloomFilter(citizenID) == false) {
-          cout << "  REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 157"
-               << endl;
+          cout << "  REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
           break;
         }
 
       } else {
-        cout << "  REQUEST REJECTED - YOU ARE NOT VACCINATED LINE 162" << endl;
+        cout << "  REQUEST REJECTED - YOU ARE NOT VACCINATED LINE " << endl;
         break;
       }
-      cout << countrFrom << endl;
+
       MonitorCountryNode *search =
           mCountriesList->getMonitorByCountryName(input_dir + "/" + countrFrom);
       if (search == nullptr) {
-        cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 169 " << endl;
+        cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
         break;
       } else {
         int MonitorID = search->getMonitorID();
@@ -179,7 +178,7 @@ int main(int argc, char **argv) {
         // waiting to recieve yes or no from monitor
         string answerFromMonitor =
             readStringClient(fdList, socketBufferSize, MonitorID);
-        cout << answerFromMonitor << endl;
+
         if (answerFromMonitor == "YES") {
           int dayReturned = readIntClient(fdList, MonitorID);
           int monthReturend = readIntClient(fdList, MonitorID);
@@ -196,12 +195,10 @@ int main(int argc, char **argv) {
           } else if (distanceOfDates >= 0) {
             cout << " REQUEST ACCEPTED – HAPPY TRAVELS" << endl;
           } else {
-            cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 197"
-                 << endl;
+            cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
           }
         } else {
-          cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED LINE 200 "
-               << endl;
+          cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED LINE " << endl;
         }
       }
 

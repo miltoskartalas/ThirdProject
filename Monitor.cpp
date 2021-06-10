@@ -200,12 +200,12 @@ int main(int argc, char **argv) {
 
       if (skip->search(&skip, citizenIDRecieved) == nullptr) {
         answer = "NO";
-        cout << "line 203 " << answer << endl;
+
         sentStringServer(answer, socketBufferSize, socketFromAcc);
         rejected++;
       } else {
         answer = "YES";
-        cout << "line 208 " << answer << endl;
+
         sentStringServer(answer, socketBufferSize, socketFromAcc);
         Date *dateOfVacc = skip->search(&skip, citizenIDRecieved)
                                ->getCitizen()
