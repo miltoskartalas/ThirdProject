@@ -16,6 +16,8 @@
 using namespace std;
 pthread_t *threadArray;
 
+// function that read line by line from txt and filling all my data structures
+
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
 void addTofile(string fileName, CountryList **countriesList,
@@ -66,9 +68,7 @@ void addTofile(string fileName, CountryList **countriesList,
       continue;
     }
 
-    if (vaccinationStatus) { // if citizen has been vaccinated
-      //  cout << "citizen id : " << wordRead[0] << " age : " << wordRead[4] <<
-      //  endl;
+    if (vaccinationStatus) {
       citizen = (*citizensList)
                     ->addCitizen(stoi(wordRead[0]), wordRead[1], wordRead[2],
                                  country, stoi(wordRead[4]), virus,
@@ -160,7 +160,7 @@ void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
   if (send(writeFileDescriptor, &transferSizeOfBloom, sizeof(int), 0) == -1) {
     perror(" Couldnt sent sizeOfBloom");
   }
-
+  // round robin
   int countriesPerMonitor = 0;
   if (monitorIndex < numOfCountries % numMonitors) {
     countriesPerMonitor = numOfCountries / numMonitors + 1;
@@ -194,6 +194,8 @@ void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
     ptr += bufferSize;
   }
 }
+
+// function that sends  directories to each monitor
 
 void sentCountriesDirectories(FileDescriptorList *fdList,
                               MonitorCountriesList *mCountriesList,
@@ -241,7 +243,7 @@ void sentCountriesDirectories(FileDescriptorList *fdList,
     }
   }
 }
-
+// function that read bloom filters when they are ready to be send by monitors
 void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
                                  BloomList *BloomFilters, int bfSize,
                                  int sizeOfBloom) {
@@ -273,12 +275,16 @@ void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
       int bloomInt = readIntClient(fdList, monID);
       bloomF[i] = bloomF[i] | bloomInt;
     }
+    //  bytes that may not be send because buffersize division with int
+    // gives a module left
     if (leftovers > 0) {
       int bloomIntLeft = readIntClient(fdList, monID);
       bloomF[i] = bloomF[i] | bloomIntLeft;
     }
   }
 }
+// function that read String from server,  fdList is the list that has each sock
+// travelMonitor uses this function
 string readStringClient(FileDescriptorList *fdList, int bufferSize, int MonID) {
 
   int sock = fdList->getFileDescriptor(MonID);
@@ -298,21 +304,23 @@ string readStringClient(FileDescriptorList *fdList, int bufferSize, int MonID) {
 
   for (int i = 0; i <= sizeOfWholeStr / bufferSize; i++) {
     char readPart[transportSize];
-
+    // this if function is checking cases that the size of string
+    // is not perfeclty divided by buffersize, so there will be some bytes
+    // remaining that have to be sent
     if (i == sizeOfWholeStr / bufferSize) {
       transportSize = sizeOfWholeStr % bufferSize;
     }
     if (recv(sock, &readPart, transportSize, MSG_WAITALL) == -1) {
-      perror("Couldnt read part of the string CLIENT ");
+      perror("Couldnt read part of the string  ");
     }
     readPart[transportSize] = '\0';
 
     wholeStr.append(readPart);
-    // cout << "Read " << wholeStr << "  of size " << sizeOfWholeStr << endl;
   }
   // sentStringClient(fdList, "FIN", bufferSize, MonID);
   return wholeStr;
 }
+// function for server that reads from client
 string readStringServer(int bufferSize, int sock) {
 
   string wholeStr = "";
@@ -329,7 +337,7 @@ string readStringServer(int bufferSize, int sock) {
       transportSize = sizeOfWholeStr % bufferSize;
     }
     if (recv(sock, &readPart, transportSize, MSG_WAITALL) == -1) {
-      perror("Couldnt read part of the string SERVER ");
+      perror("Couldnt read part of the string  ");
     }
 
     readPart[transportSize] = '\0';
@@ -338,7 +346,7 @@ string readStringServer(int bufferSize, int sock) {
 
   return wholeStr;
 }
-
+// function that sents string from client
 void sentStringClient(FileDescriptorList *fdList, string sentString,
                       int bufferSize, int MonID) {
 
@@ -363,6 +371,7 @@ void sentStringClient(FileDescriptorList *fdList, string sentString,
     ptr += transportSize;
   }
 }
+// sending string to server from client
 void sentStringServer(string sentString, int bufferSize, int sock) {
 
   int sizeOfsentString = strlen(sentString.c_str());
@@ -385,6 +394,8 @@ void sentStringServer(string sentString, int bufferSize, int sock) {
   // while (readStringServer(bufferSize, sock) != "FIN")
   //   ;
 }
+// function that reads int from server so fdlist is needed and monID
+// so travelMonitor knows from which monitor will read
 
 int readIntClient(FileDescriptorList *fdList, int MonID) {
 
@@ -397,6 +408,8 @@ int readIntClient(FileDescriptorList *fdList, int MonID) {
   }
   return integer;
 }
+
+// function for server so to read int from client
 int readIntServer(int sock) {
   int integer = 0;
   if (recv(sock, &integer, sizeof(int), MSG_WAITALL) == -1) {
@@ -406,6 +419,7 @@ int readIntServer(int sock) {
 
   return integer;
 }
+// function that send int to server
 void sentIntClient(FileDescriptorList *fdList, int MonID, int integer) {
 
   int sock = fdList->getFileDescriptor(MonID);
@@ -414,13 +428,16 @@ void sentIntClient(FileDescriptorList *fdList, int MonID, int integer) {
     perror(" Couldnt send integer  CLIENT ");
   }
 }
-
+// function that sent int to client
 void sentIntServer(int integer, int sock) {
   //  cout << "sent int server " << integer << endl;
   if (send(sock, &integer, sizeof(int), 0) == -1) {
     perror(" Couldnt send integer SERVER ");
   }
 }
+
+// this function is the one that each thread will execute
+
 void *threadFunction(void *args) {
   threadInfo *threadArgs = (threadInfo *)args;
   Buffer *buffer = threadArgs->buffer;
@@ -443,8 +460,6 @@ void *threadFunction(void *args) {
   return nullptr;
 }
 
-void fillBuffer(string *paths, int numPaths) {}
-
 void createThreads(int numThreads, threadInfo *threadArgs) {
 
   threadArray = new pthread_t[numThreads];
@@ -457,7 +472,7 @@ void createThreads(int numThreads, threadInfo *threadArgs) {
     }
   }
 }
-
+// this function gets paths from directories
 CountryList *pathsInDirectories(int numdirs, string *dirs) {
   CountryList *countries = new CountryList();
   dirent *countryFile;

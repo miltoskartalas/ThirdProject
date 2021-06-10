@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
                               socketBufferSize, cyclicBufferSize, sizeOfBloom,
                               mCountriesList, numOfCountries, input_dir);
   }
+  // initializing connection with every server
   for (int i = 0; i < numMonitors; i++) {
     struct hostent *host;
     struct sockaddr_in server;
@@ -91,7 +92,7 @@ int main(int argc, char **argv) {
       close(sock);
       exit(EXIT_FAILURE);
     }
-
+    // adding to my list sock that each server has
     fdList->addFileDescriptor(sock, i);
     char myPc[256];
     myPc[255] = '\0';
@@ -115,16 +116,17 @@ int main(int argc, char **argv) {
       connected = connect(sock, serverptr, sizeof(*serverptr));
     } while (connected < 0);
 
-    cout << "Connected to Port " << PORT + i << endl;
+    // cout << "Connected to Port " << PORT + i << endl;
   }
   for (int i = 0; i < numMonitors; i++) {
-
+    // recieving bloomfilters fro every monitor server
     BloomList *BloomFilters = new BloomList();
     int numViruses = readIntClient(fdList, i);
     readBloomFiltersFromMonitor(fdList, i, BloomFilters, socketBufferSize,
                                 sizeOfBloom);
   }
   for (int i = 0; i < numMonitors; i++) {
+    // when i recieve bloomFilters i sent -1 that means each finished
     sentIntClient(fdList, i, -1);
   }
 }

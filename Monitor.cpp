@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
   socklen_t clientlen = sizeof(clientptr);
   socklen_t serverlen = sizeof(serverptr);
 
+  // taking arguments
   int port = atoi(argv[0]);
   int numThreads = atoi(argv[1]);
   int socketBufferSize = atoi(argv[2]);
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
     string path(argv[5 + i]);
     paths[i] = path;
   }
+  // in this list i am saving all my txts that each country has
   CountryList *countryFiles = pathsInDirectories(numPaths, paths);
   int numCountryPaths = countryFiles->getNumCountries();
   string *allCountryPaths = new string[numCountryPaths];
@@ -135,7 +137,7 @@ int main(int argc, char **argv) {
   createThreads(numThreads, threadArgs);
 
   int completedPaths = 0;
-
+  // giving to buffer the paths that it will need
   while (true) {
     place(buffer, allCountryPaths[completedPaths++]);
     if (completedPaths == numCountryPaths) {
@@ -153,8 +155,10 @@ int main(int argc, char **argv) {
   VirusNode *virus = virusesList->getStart();
 
   while (virus != nullptr) {
+    // taking the name of the virus that his bloomfilters i am going to send
+    // right above
     string sentVirus = *(virus->getVirusName());
-    // cout << "Sending " << sentVirus << endl;
+    //  cout << "Sending " << sentVirus << endl;
     sentStringServer(sentVirus, socketBufferSize, socketFromAcc);
 
     int intsOfBloom = sizeOfBloom / sizeof(int);
@@ -162,14 +166,18 @@ int main(int argc, char **argv) {
     int i;
     int *BloomArray = virus->getBloomFilter()->getBloomArray();
 
+    // sending till the amount of bytes that its division with buffer is perfect
     for (i = 0; i < intsOfBloom; i++) {
       sentIntServer(BloomArray[i], socketFromAcc);
     }
+    // here sending the reaminings if any
     if (leftovers > 0) {
       sentIntServer(BloomArray[i], socketFromAcc);
     }
     virus = virus->next;
   }
+
+  // this is sent so to know that its finished
   sentIntServer(-1, socketFromAcc);
 
   readIntServer(socketFromAcc);

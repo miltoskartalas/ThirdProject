@@ -3,7 +3,8 @@
 #include <limits.h>
 #include <string>
 using namespace std;
-
+// this structure is created so i can know for each monitor which countries
+// has
 MonitorCountryNode::MonitorCountryNode(string CountryName) {
   this->CountryName = CountryName;
   this->next = nullptr;
@@ -44,7 +45,7 @@ string *MonitorCountriesList::addMonitorCountryNode(string country,
 }
 
 void MonitorCountriesList::print() // print function for the list
-{                                  // which calls for every CountryNode its print function
+{ // which calls for every CountryNode its print function
   MonitorCountryNode *current = start;
   while (current) {
     current->print();

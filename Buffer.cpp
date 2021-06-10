@@ -30,7 +30,8 @@ void place(Buffer *buffer, string path) {
   buffer->buffer[buffer->end] = path;
   buffer->count++;
 
-  //cout << "[Place]  count " << buffer->count << " pathsRead : " << buffer->pathsRead << "path : " << path << endl;
+  // cout << "[Place]  count " << buffer->count << " pathsRead : " <<
+  // buffer->pathsRead << "path : " << path << endl;
   pthread_mutex_unlock(&(buffer->bufferMutex));
 
   pthread_cond_signal(&(buffer->cond_nonempty));
@@ -47,7 +48,8 @@ string obtain(Buffer *buffer) {
   pathToGet = buffer->buffer[buffer->start];
   buffer->start = (buffer->start + 1) % buffer->cyclicBufferSize;
   buffer->count--;
-  //cout << "[Get]  count " << buffer->count << " pathsRead : " << buffer->pathsRead << " path : " << pathToGet << endl;
+  // cout << "[Get]  count " << buffer->count << " pathsRead : " <<
+  // buffer->pathsRead << " path : " << pathToGet << endl;
   pthread_mutex_unlock(&(buffer->bufferMutex));
   pthread_cond_signal(&(buffer->cond_nonfull));
   return pathToGet;
