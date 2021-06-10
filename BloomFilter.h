@@ -11,12 +11,12 @@ private:            // with size and a pointer array
   int *Array;
 
 public:
-  void PrintArray();
+  void print();
   bool checkBloomFilter(int citizenID);
   int TestBit(int k);
   void changeBit(int k);
   int *getBloomArray() { return Array; };
-  int getSize() { return SizeOfBloomFilter * sizeof(int); };
+  int getSize() { return SizeOfBloomFilter * 32; };
   BloomFilter(int SizeOfBloomFilter);
   ~BloomFilter();
 };

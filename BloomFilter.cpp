@@ -8,7 +8,8 @@ using namespace std;
 BloomFilter::BloomFilter(
     int SizeOfBloomFilter) { // creating size of bloom filter
   this->SizeOfBloomFilter =
-      SizeOfBloomFilter / (sizeof(int)); // dependin on input
+      SizeOfBloomFilter / (sizeof(int)) +
+      (SizeOfBloomFilter % sizeof(int) != 0); // dependin on input
   Array = new int[this->SizeOfBloomFilter];
   for (int i = 0; i < this->SizeOfBloomFilter; i++) {
     this->Array[i] = 0;
@@ -47,7 +48,7 @@ bool BloomFilter::checkBloomFilter(int citizenID) // checking
 
   int size = this->getSize();
   for (int i = 0; i < 16; i++) {
-    unsigned long bloomBit = hash_i(citizenHash, i) % (8 * size);
+    unsigned long bloomBit = hash_i(citizenHash, i) % (size);
     if (!this->TestBit(bloomBit)) {
       // free(citizenHash);
       return false;
@@ -55,4 +56,11 @@ bool BloomFilter::checkBloomFilter(int citizenID) // checking
   }
   // free(citizenHash);
   return true;
+}
+
+void BloomFilter::print() {
+  for (int i = 0; i < getSize(); i++) {
+    cout << TestBit(i);
+  }
+  cout << endl;
 }

@@ -166,7 +166,8 @@ int main(int argc, char **argv) {
     int i;
     int *BloomArray = virus->getBloomFilter()->getBloomArray();
 
-    // sending till the amount of bytes that its division with buffer is perfect
+    // sending till the amount of bytes that its division with buffer is
+    // perfect
     for (i = 0; i < intsOfBloom; i++) {
       sentIntServer(BloomArray[i], socketFromAcc);
     }
@@ -181,4 +182,43 @@ int main(int argc, char **argv) {
   sentIntServer(-1, socketFromAcc);
 
   readIntServer(socketFromAcc);
+
+  //  waiting {for commands
+  while (true) {
+
+    string commandRecieved = readStringServer(socketBufferSize, socketFromAcc);
+    string VirusNameRecieved = "";
+    int citizenIDRecieved = 0;
+    string answer = "";
+    if (commandRecieved == "/travelRequest") {
+      VirusNameRecieved = readStringServer(socketBufferSize, socketFromAcc);
+      citizenIDRecieved = readIntServer(socketFromAcc);
+    }
+    VirusNode *skipV = virusesList->searchInVirusList(VirusNameRecieved);
+    if (skipV != nullptr) {
+      SkipList_list *skip = skipV->getSkipList(true);
+
+      if (skip->search(&skip, citizenIDRecieved) == nullptr) {
+        answer = "NO";
+        cout << "line 203 " << answer << endl;
+        sentStringServer(answer, socketBufferSize, socketFromAcc);
+        rejected++;
+      } else {
+        answer = "YES";
+        cout << "line 208 " << answer << endl;
+        sentStringServer(answer, socketBufferSize, socketFromAcc);
+        Date *dateOfVacc = skip->search(&skip, citizenIDRecieved)
+                               ->getCitizen()
+                               ->getVaccinations()
+                               ->existsVaccination(VirusNameRecieved)
+                               ->getDate();
+        int day = (dateOfVacc->month);
+        int month = (dateOfVacc->month);
+        int year = (dateOfVacc->year);
+        sentIntServer(day, socketFromAcc);
+        sentIntServer(month, socketFromAcc);
+        sentIntServer(year, socketFromAcc);
+      }
+    }
+  }
 }

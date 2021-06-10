@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <bitset>
 #include <cstring>
 #include <dirent.h>
 #include <fcntl.h>
@@ -101,7 +102,9 @@ pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
         monitorIndexRound = 0; // reset index for round robin
 
       string directory = country->d_name;
+
       if (monitorIndex == monitorIndexRound) {
+
         mCountriesList->addMonitorCountryNode(input_dir + "/" + country->d_name,
                                               monitorIndexRound);
       }
@@ -268,6 +271,10 @@ void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
     int *bloomF = BloomFilters->searchInBloomList(virusName)
                       ->getFilter()
                       ->getBloomArray();
+    // cout << virusName << endl;
+    // cout << virusName << " "
+    //      << "BEFORE ";
+
     int leftovers = sizeOfBloom % sizeof(int);
     int i;
     for (i = 0; i < intsOfBloom; i++) {

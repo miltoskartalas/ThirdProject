@@ -45,6 +45,7 @@ void VirusNode::addToBloomFilter(int citizenID) {
     bloomFilter->changeBit(bloomBit);
   }
 }
+
 bool VirusList::VirusPrintNotVaccSkiplist(string virusName) {
 
   VirusNode *current = start;

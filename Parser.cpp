@@ -74,9 +74,9 @@ int Parser::parse() // this function is the main function that get all the input
     cout << "Command not found" << endl;
     return EXIT_FAILURE;
   }
-  cout << this->command << endl;
-  cout << numArgs << " " << minArgs[this->command - 1] << " "
-       << maxArgs[this->command - 1] << endl;
+  // cout << this->command << endl;
+  // cout << numArgs << " " << minArgs[this->command - 1] << " "
+  //      << maxArgs[this->command - 1] << endl;
   if (numArgs >= minArgs[this->command - 1] &&
       numArgs <= maxArgs[this->command - 1]) {
     return EXIT_SUCCESS;

@@ -107,7 +107,8 @@ MonitorCountryNode *
 MonitorCountriesList::getMonitorByCountryName(string CountryName) {
   MonitorCountryNode *temp = start;
 
-  while ((temp->next != nullptr)) {
+  while ((temp != nullptr)) {
+    cout << *(temp->getMonitorCountryNodeName()) << endl;
     if (*temp->getMonitorCountryNodeName() == CountryName) {
       return temp;
     }

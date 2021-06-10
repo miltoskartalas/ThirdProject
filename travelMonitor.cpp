@@ -118,9 +118,9 @@ int main(int argc, char **argv) {
 
     // cout << "Connected to Port " << PORT + i << endl;
   }
+  BloomList *BloomFilters = new BloomList();
   for (int i = 0; i < numMonitors; i++) {
     // recieving bloomfilters fro every monitor server
-    BloomList *BloomFilters = new BloomList();
     int numViruses = readIntClient(fdList, i);
     readBloomFiltersFromMonitor(fdList, i, BloomFilters, socketBufferSize,
                                 sizeOfBloom);
@@ -129,4 +129,98 @@ int main(int argc, char **argv) {
     // when i recieve bloomFilters i sent -1 that means each finished
     sentIntClient(fdList, i, -1);
   }
+
+  Parser *parser = nullptr;
+  parser = new Parser();
+  do {
+    parser->clean();
+    if ((parser->parse()) == EXIT_FAILURE) {
+      continue;
+    }
+    switch (parser->command) {
+    case 1: {
+      string firstCommand = "/travelRequest";
+      // string firstCommand = "/travelRequest";
+      Date *date = nullptr;
+      int citizenID = stoi(parser->args[0]);
+      date = getDate(parser->args[1]);
+      string countrFrom = parser->args[2];
+      string countrTo = parser->args[3];
+      string VirusName = parser->args[4];
+
+      if (BloomFilters->searchInBloomList(VirusName) != nullptr) {
+
+        BloomFilter *bloomF =
+            BloomFilters->searchInBloomList(VirusName)->getFilter();
+
+        if (bloomF->checkBloomFilter(citizenID) == false) {
+          cout << "  REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 157"
+               << endl;
+          break;
+        }
+
+      } else {
+        cout << "  REQUEST REJECTED - YOU ARE NOT VACCINATED LINE 162" << endl;
+        break;
+      }
+      cout << countrFrom << endl;
+      MonitorCountryNode *search =
+          mCountriesList->getMonitorByCountryName(input_dir + "/" + countrFrom);
+      if (search == nullptr) {
+        cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 169 " << endl;
+        break;
+      } else {
+        int MonitorID = search->getMonitorID();
+        int sock = fdList->getFileDescriptor(MonitorID);
+        sentStringClient(fdList, firstCommand, socketBufferSize, MonitorID);
+        sentStringClient(fdList, VirusName, socketBufferSize, MonitorID);
+        sentIntClient(fdList, MonitorID, citizenID);
+
+        // waiting to recieve yes or no from monitor
+        string answerFromMonitor =
+            readStringClient(fdList, socketBufferSize, MonitorID);
+        cout << answerFromMonitor << endl;
+        if (answerFromMonitor == "YES") {
+          int dayReturned = readIntClient(fdList, MonitorID);
+          int monthReturend = readIntClient(fdList, MonitorID);
+          int yearReturned = readIntClient(fdList, MonitorID);
+          int distanceOfDates =
+              (date->day + date->month * 30 + date->year * 360) -
+              (dayReturned + 30 * monthReturend + 360 * yearReturned);
+
+          if (distanceOfDates > 180) {
+            cout << "REQUEST REJECTED – YOU WILL NEED ANOTHER VACCINATION "
+                    "BEFORE "
+                    "TRAVEL DATE"
+                 << endl;
+          } else if (distanceOfDates >= 0) {
+            cout << " REQUEST ACCEPTED – HAPPY TRAVELS" << endl;
+          } else {
+            cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE 197"
+                 << endl;
+          }
+        } else {
+          cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED LINE 200 "
+               << endl;
+        }
+      }
+
+      break;
+    }
+    case 2: {
+
+      break;
+    }
+    case 3: {
+
+      break;
+    }
+    case 4: {
+
+      break;
+    }
+    case 5: {
+    }
+    }
+  } while (true);
 }
