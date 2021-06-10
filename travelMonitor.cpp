@@ -154,19 +154,19 @@ int main(int argc, char **argv) {
             BloomFilters->searchInBloomList(VirusName)->getFilter();
 
         if (bloomF->checkBloomFilter(citizenID) == false) {
-          cout << "  REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
+          cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED " << endl;
           break;
         }
 
       } else {
-        cout << "  REQUEST REJECTED - YOU ARE NOT VACCINATED LINE " << endl;
+        cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED " << endl;
         break;
       }
 
       MonitorCountryNode *search =
           mCountriesList->getMonitorByCountryName(input_dir + "/" + countrFrom);
       if (search == nullptr) {
-        cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
+        cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED " << endl;
         break;
       } else {
         int MonitorID = search->getMonitorID();
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
             cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
           }
         } else {
-          cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED LINE " << endl;
+          cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED " << endl;
         }
       }
 
