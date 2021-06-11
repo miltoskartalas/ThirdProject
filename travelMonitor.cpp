@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
           } else if (distanceOfDates >= 0) {
             cout << " REQUEST ACCEPTED – HAPPY TRAVELS" << endl;
           } else {
-            cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED LINE " << endl;
+            cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED " << endl;
           }
         } else {
           cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED " << endl;
@@ -221,32 +221,42 @@ int main(int argc, char **argv) {
       for (int i = 0; i < numMonitors; i++) {
         sentStringClient(fdList, fourthCommand, socketBufferSize, i);
         sentIntClient(fdList, i, citizenID);
+
         foundCitizen = readStringClient(fdList, socketBufferSize, i);
+
         if (foundCitizen == "FOUND") {
+
           int ageReturned = readIntClient(fdList, i);
+
           string firstNameRecieved =
               readStringClient(fdList, socketBufferSize, i);
+
           string LastNameRecieved =
               readStringClient(fdList, socketBufferSize, i);
+
           string countryRecieved =
               readStringClient(fdList, socketBufferSize, i);
           cout << citizenID << " " << firstNameRecieved << " "
                << LastNameRecieved << " " << countryRecieved << endl;
           cout << "AGE " << ageReturned << endl;
+          int count = 0;
           while (true) {
             string virusNameVacc;
-            if (readStringClient(fdList, socketBufferSize, i) == "YES") {
+            string vaccinatedOrNot =
+                readStringClient(fdList, socketBufferSize, i);
+            // cout << vaccinatedOrNot << endl;
+            if (vaccinatedOrNot == "YES") {
               virusNameVacc = readStringClient(fdList, socketBufferSize, i);
               int dayReturned = readIntClient(fdList, i);
               int monthReturend = readIntClient(fdList, i);
               int yearReturned = readIntClient(fdList, i);
-
               cout << virusNameVacc << " VACCINATED ON " << dayReturned << "-"
                    << monthReturend << "-" << yearReturned << endl;
-            } else if (readStringClient(fdList, socketBufferSize, i) == "NO") {
+
+            } else if (vaccinatedOrNot == "NO") {
               virusNameVacc = readStringClient(fdList, socketBufferSize, i);
               cout << virusNameVacc << " NOT YET VACCINATED" << endl;
-            } else if (readStringClient(fdList, socketBufferSize, i) == "END") {
+            } else if (vaccinatedOrNot == "END") {
               break;
             }
           }

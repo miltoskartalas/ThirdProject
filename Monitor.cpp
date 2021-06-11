@@ -225,25 +225,31 @@ int main(int argc, char **argv) {
     }
     if (commandRecieved == "/searchVaccinationStatus") {
       citizenIDRecieved = readIntServer(socketFromAcc);
+
       CitizenNode *citizen =
           citizensList->searchInCitizenList(citizenIDRecieved);
+      cout << "Monitor got searchVaccinationStatus for citizen "
+           << citizen->getCitizenID() << endl;
+      cout << endl;
 
       if (citizen != nullptr) {
+
         sentStringServer("FOUND", socketBufferSize, socketFromAcc);
-        int age = citizen->getCitizenAge();
-        string firstName = citizen->getFirstName();
-        string lastName = citizen->getLastName();
-        string country = *(citizen->getCountryName());
+        sentIntServer(citizen->getCitizenAge(), socketFromAcc);
 
+        sentStringServer(citizen->getFirstName(), socketBufferSize,
+                         socketFromAcc);
+        sentStringServer(citizen->getLastName(), socketBufferSize,
+                         socketFromAcc);
+        sentStringServer(*(citizen->getCountryName()), socketBufferSize,
+                         socketFromAcc);
         VirusNode *current = virusesList->getStart();
-        while (current != nullptr) {
-          SkipList_list *skip = current->getSkipList(true);
-          if (skip->search(&skip, citizenIDRecieved) == nullptr) {
-            sentStringServer("NOT", socketBufferSize, socketFromAcc);
 
-            sentStringServer(*(current->getVirusName()), socketBufferSize,
-                             socketFromAcc);
-          } else {
+        SkipList_list *skip = current->getSkipList(true);
+        while (current != nullptr) {
+
+          if ((skip->search(&skip, citizenIDRecieved)) != nullptr) {
+
             sentStringServer("YES", socketBufferSize, socketFromAcc);
             sentStringServer(*(current->getVirusName()), socketBufferSize,
                              socketFromAcc);
@@ -251,14 +257,31 @@ int main(int argc, char **argv) {
                 citizen->getVaccinations()
                     ->existsVaccination(*(current->getVirusName()))
                     ->getDate();
-            int day = (dateOfVacc->month);
+            int day = (dateOfVacc->day);
             int month = (dateOfVacc->month);
             int year = (dateOfVacc->year);
             sentIntServer(day, socketFromAcc);
             sentIntServer(month, socketFromAcc);
             sentIntServer(year, socketFromAcc);
           }
+          current = current->next;
+          if (current != nullptr)
+            skip = current->getSkipList(true);
         }
+        VirusNode *currentFalse = virusesList->getStart();
+        SkipList_list *skipFalse = currentFalse->getSkipList(false);
+        while (currentFalse != nullptr) {
+          if ((skipFalse->search(&skipFalse, citizenIDRecieved)) != nullptr) {
+
+            sentStringServer("NO", socketBufferSize, socketFromAcc);
+            sentStringServer(*(currentFalse->getVirusName()), socketBufferSize,
+                             socketFromAcc);
+          }
+          currentFalse = currentFalse->next;
+          if (currentFalse != nullptr)
+            skipFalse = currentFalse->getSkipList(false);
+        }
+
         sentStringServer("END", socketBufferSize, socketFromAcc);
       }
     }

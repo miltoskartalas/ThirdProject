@@ -100,10 +100,13 @@ Vaccination *CitizenNode::existsVaccination(string virus) {
 CitizenNode *CitizenList::searchInCitizenList(
     int citizenID) // this function is searching everynode
 { // in the citizen list an returns it if the citizen with the citizenID
+
   CitizenNode *current =
       start; // given is in the list, otherwise it returns nullptr
-  while (current) {
-    if (current->getCitizenID() == citizenID) {
+  while (current != nullptr) {
+    if ((current->getCitizenID()) == citizenID) {
+      // cout << "CITIZEN LIST " << current->getFirstName() << endl;
+      // cout << " CITIZEN LIST " << current->getCitizenID() << endl;
       return current; // citizen already exists
     }
     current = current->next;
