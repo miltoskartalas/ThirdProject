@@ -193,32 +193,76 @@ int main(int argc, char **argv) {
     if (commandRecieved == "/travelRequest") {
       VirusNameRecieved = readStringServer(socketBufferSize, socketFromAcc);
       citizenIDRecieved = readIntServer(socketFromAcc);
-    }
-    VirusNode *skipV = virusesList->searchInVirusList(VirusNameRecieved);
-    if (skipV != nullptr) {
-      SkipList_list *skip = skipV->getSkipList(true);
+      VirusNode *skipV = virusesList->searchInVirusList(VirusNameRecieved);
+      if (skipV != nullptr) {
+        SkipList_list *skip = skipV->getSkipList(true);
 
-      if (skip->search(&skip, citizenIDRecieved) == nullptr) {
-        answer = "NO";
+        if (skip->search(&skip, citizenIDRecieved) == nullptr) {
+          answer = "NO";
 
-        sentStringServer(answer, socketBufferSize, socketFromAcc);
-        rejected++;
-      } else {
-        answer = "YES";
+          sentStringServer(answer, socketBufferSize, socketFromAcc);
+          rejected++;
+        } else {
+          answer = "YES";
 
-        sentStringServer(answer, socketBufferSize, socketFromAcc);
-        Date *dateOfVacc = skip->search(&skip, citizenIDRecieved)
-                               ->getCitizen()
-                               ->getVaccinations()
-                               ->existsVaccination(VirusNameRecieved)
-                               ->getDate();
-        int day = (dateOfVacc->month);
-        int month = (dateOfVacc->month);
-        int year = (dateOfVacc->year);
-        sentIntServer(day, socketFromAcc);
-        sentIntServer(month, socketFromAcc);
-        sentIntServer(year, socketFromAcc);
+          sentStringServer(answer, socketBufferSize, socketFromAcc);
+          Date *dateOfVacc = skip->search(&skip, citizenIDRecieved)
+                                 ->getCitizen()
+                                 ->getVaccinations()
+                                 ->existsVaccination(VirusNameRecieved)
+                                 ->getDate();
+          int day = (dateOfVacc->month);
+          int month = (dateOfVacc->month);
+          int year = (dateOfVacc->year);
+          sentIntServer(day, socketFromAcc);
+          sentIntServer(month, socketFromAcc);
+          sentIntServer(year, socketFromAcc);
+        }
       }
+    }
+
+    if (commandRecieved == "/addVaccinationRecords") {
+    }
+    if (commandRecieved == "/searchVaccinationStatus") {
+      citizenIDRecieved = readIntServer(socketFromAcc);
+      CitizenNode *citizen =
+          citizensList->searchInCitizenList(citizenIDRecieved);
+
+      if (citizen != nullptr) {
+        sentStringServer("FOUND", socketBufferSize, socketFromAcc);
+        int age = citizen->getCitizenAge();
+        string firstName = citizen->getFirstName();
+        string lastName = citizen->getLastName();
+        string country = *(citizen->getCountryName());
+
+        VirusNode *current = virusesList->getStart();
+        while (current != nullptr) {
+          SkipList_list *skip = current->getSkipList(true);
+          if (skip->search(&skip, citizenIDRecieved) == nullptr) {
+            sentStringServer("NOT", socketBufferSize, socketFromAcc);
+
+            sentStringServer(*(current->getVirusName()), socketBufferSize,
+                             socketFromAcc);
+          } else {
+            sentStringServer("YES", socketBufferSize, socketFromAcc);
+            sentStringServer(*(current->getVirusName()), socketBufferSize,
+                             socketFromAcc);
+            Date *dateOfVacc =
+                citizen->getVaccinations()
+                    ->existsVaccination(*(current->getVirusName()))
+                    ->getDate();
+            int day = (dateOfVacc->month);
+            int month = (dateOfVacc->month);
+            int year = (dateOfVacc->year);
+            sentIntServer(day, socketFromAcc);
+            sentIntServer(month, socketFromAcc);
+            sentIntServer(year, socketFromAcc);
+          }
+        }
+        sentStringServer("END", socketBufferSize, socketFromAcc);
+      }
+    }
+    if (commandRecieved == "/exit") {
     }
   }
 }

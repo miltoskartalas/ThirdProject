@@ -205,18 +205,57 @@ int main(int argc, char **argv) {
       break;
     }
     case 2: {
+      string secondCommand = "/travelStats";
 
       break;
     }
     case 3: {
+      string thirdCommand = "/addVaccinationRecords";
 
       break;
     }
     case 4: {
+      string fourthCommand = "/searchVaccinationStatus";
+      string foundCitizen;
+      int citizenID = stoi(parser->args[0]);
+      for (int i = 0; i < numMonitors; i++) {
+        sentStringClient(fdList, fourthCommand, socketBufferSize, i);
+        sentIntClient(fdList, i, citizenID);
+        foundCitizen = readStringClient(fdList, socketBufferSize, i);
+        if (foundCitizen == "FOUND") {
+          int ageReturned = readIntClient(fdList, i);
+          string firstNameRecieved =
+              readStringClient(fdList, socketBufferSize, i);
+          string LastNameRecieved =
+              readStringClient(fdList, socketBufferSize, i);
+          string countryRecieved =
+              readStringClient(fdList, socketBufferSize, i);
+          cout << citizenID << " " << firstNameRecieved << " "
+               << LastNameRecieved << " " << countryRecieved << endl;
+          cout << "AGE " << ageReturned << endl;
+          while (true) {
+            string virusNameVacc;
+            if (readStringClient(fdList, socketBufferSize, i) == "YES") {
+              virusNameVacc = readStringClient(fdList, socketBufferSize, i);
+              int dayReturned = readIntClient(fdList, i);
+              int monthReturend = readIntClient(fdList, i);
+              int yearReturned = readIntClient(fdList, i);
 
+              cout << virusNameVacc << " VACCINATED ON " << dayReturned << "-"
+                   << monthReturend << "-" << yearReturned << endl;
+            } else if (readStringClient(fdList, socketBufferSize, i) == "NO") {
+              virusNameVacc = readStringClient(fdList, socketBufferSize, i);
+              cout << virusNameVacc << " NOT YET VACCINATED" << endl;
+            } else if (readStringClient(fdList, socketBufferSize, i) == "END") {
+              break;
+            }
+          }
+        }
+      }
       break;
     }
     case 5: {
+      string fifthCommand = "/exit";
     }
     }
   } while (true);
