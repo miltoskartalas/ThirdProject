@@ -10,7 +10,11 @@ FileDescriptor::FileDescriptor(int socket, int MonID) {
   this->MonID = MonID;
 }
 
-FileDescriptor::~FileDescriptor(){};
+FileDescriptor::~FileDescriptor() {
+  if (next != nullptr) {
+    delete next;
+  }
+};
 
 FileDescriptorList::FileDescriptorList() {
   this->start = nullptr;
@@ -19,8 +23,8 @@ FileDescriptorList::FileDescriptorList() {
 
 FileDescriptorList::~FileDescriptorList() {
   FileDescriptor *current = start;
-  FileDescriptor *temp;
-  while (current) {
+  FileDescriptor *temp = nullptr;
+  while (current != nullptr) {
 
     temp = current->next;
     delete current;

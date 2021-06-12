@@ -10,7 +10,9 @@ MonitorCountryNode::MonitorCountryNode(string CountryName) {
   this->next = nullptr;
 }
 
-MonitorCountryNode::~MonitorCountryNode(){};
+MonitorCountryNode::~MonitorCountryNode(){
+
+};
 
 MonitorCountriesList::MonitorCountriesList() {
 

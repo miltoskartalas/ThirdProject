@@ -50,6 +50,12 @@ string obtain(Buffer *buffer) {
   buffer->count--;
   // cout << "[Get]  count " << buffer->count << " pathsRead : " <<
   // buffer->pathsRead << " path : " << pathToGet << endl;
+  if (pathToGet == "END") {
+
+    pthread_mutex_unlock(&(buffer->bufferMutex));
+    pthread_cond_signal(&(buffer->cond_nonfull));
+    pthread_exit(NULL);
+  }
   pthread_mutex_unlock(&(buffer->bufferMutex));
   pthread_cond_signal(&(buffer->cond_nonfull));
   return pathToGet;

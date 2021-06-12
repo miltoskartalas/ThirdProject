@@ -296,8 +296,12 @@ int main(int argc, char **argv) {
     if (commandRecieved == "/exit") {
       cout << "exiting.. " << endl;
       for (int i = 0; i < numThreads; i++) {
+        place(buffer, "END");
+      }
+      for (int i = 0; i < numThreads; i++) {
         pthread_join(threadArray[i], NULL);
       }
+
       string logFile = "logfiles/log_file." + to_string(getpid());
       ofstream logfile;
       logfile.open(logFile);
@@ -311,16 +315,16 @@ int main(int argc, char **argv) {
       logfile << "ACCEPTED " << accepted << endl;
       logfile << "REJECTED " << rejected << endl;
 
+      delete[] threadArray;
       delete citizensList;
-      delete threadArgs;
-      delete citizensList;
+      // delete threadArgs;
+
       delete virusesList;
       delete countriesList;
 
       delete[] paths;
       delete[] allCountryPaths;
 
-      delete buffer;
       exit(1);
     }
   }

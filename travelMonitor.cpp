@@ -281,6 +281,7 @@ int main(int argc, char **argv) {
       delete parser;
       delete mCountriesList;
       delete[] mPIDS;
+
       delete BloomFilters;
       // delete fdList;
       exit(1);
