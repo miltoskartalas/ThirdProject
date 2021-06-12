@@ -1,11 +1,11 @@
 CC = g++ 
 CFLAGS = -g -std=c++11
 
-TRAVELOBJS= travelMonitor.o  Buffer.o Vaccinations.o SkipList.o MonitorCountries.o Citizen.o Viruses.o Countries.o  BloomFilter.o Hash.o ExceptionHandler.o FileDescriptor.o BloomList.o functions.o Parser.o
-MONITOROBJS =   Monitor.o Buffer.o  MonitorCountries.o ExceptionHandler.o Countries.o Viruses.o Citizen.o Hash.o BloomFilter.o Vaccinations.o SkipList.o functions.o BloomList.o FileDescriptor.o
+TRAVELOBJS= travelMonitorClient.o  Buffer.o Vaccinations.o SkipList.o MonitorCountries.o Citizen.o Viruses.o Countries.o  BloomFilter.o Hash.o ExceptionHandler.o FileDescriptor.o BloomList.o functions.o Parser.o
+MONITOROBJS =   MonitorServer.o Buffer.o  MonitorCountries.o ExceptionHandler.o Countries.o Viruses.o Citizen.o Hash.o BloomFilter.o Vaccinations.o SkipList.o functions.o BloomList.o FileDescriptor.o
 
 
-travelMonitor: clean $(TRAVELOBJS) $(MONITOROBJS)
+travelMonitorClient: clean $(TRAVELOBJS) $(MONITOROBJS)
 	$(CC) $(CFLAGS)  -o travelMonitorClient $(TRAVELOBJS) -lpthread
 	$(CC) $(CFLAGS) -o monitorServer $(MONITOROBJS) -lpthread
 
@@ -18,7 +18,7 @@ Citizen.o:
 Buffer.o:
 	$(CC) $(CFLAGS) -c Buffer.cpp
 travelMonitor.o:
-	$(CC) $(CFLAGS)  -c travelMonitor.cpp
+	$(CC) $(CFLAGS)  -c travelMonitorClient.cpp
 Hash.o:
 	$(CC) $(CFLAGS)  -c Hash.cpp
 BloomFilter.o:
@@ -30,7 +30,7 @@ Vaccinations.o:
 SkipList.o:
 	$(CC) $(CFLAGS)  -c SkipList.cpp
 Monitor.o:
-	$(CC) $(CFLAGS) -c Monitor.cpp
+	$(CC) $(CFLAGS) -c MonitorServer.cpp
 ExceptionHandler.o:
 	$(CC) $(CFLAGS) -c ExceptionHandler.cpp
 FileDescriptor.o:
