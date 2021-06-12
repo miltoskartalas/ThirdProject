@@ -201,7 +201,6 @@ int main(int argc, char **argv) {
           answer = "NO";
 
           sentStringServer(answer, socketBufferSize, socketFromAcc);
-          rejected++;
         } else {
           answer = "YES";
 
@@ -217,12 +216,18 @@ int main(int argc, char **argv) {
           sentIntServer(day, socketFromAcc);
           sentIntServer(month, socketFromAcc);
           sentIntServer(year, socketFromAcc);
+          // because calculation for accepted rejected is done to travelMonitor
+          // here i am waiting to see if what monitor send back is accepted or
+          // rejected
+          if (readStringServer(socketBufferSize, socketFromAcc) == "ACCEPTED") {
+            accepted++;
+          } else {
+            rejected++;
+          }
         }
       }
     }
 
-    if (commandRecieved == "/addVaccinationRecords") {
-    }
     if (commandRecieved == "/searchVaccinationStatus") {
       citizenIDRecieved = readIntServer(socketFromAcc);
 
@@ -286,6 +291,22 @@ int main(int argc, char **argv) {
       }
     }
     if (commandRecieved == "/exit") {
+      cout << "exiting.. " << endl;
+
+      string logFile = "logfiles/log_file." + to_string(getpid());
+      ofstream logfile;
+      logfile.open(logFile);
+
+      for (int i = 0; i < countriesList->getNumCountries(); i++) {
+
+        logfile << *(countriesList->getCountryByIndex(i)) << endl;
+      }
+
+      logfile << "TOTAL TRAVEL REQUESTS " << accepted + rejected << endl;
+      logfile << "ACCEPTED " << accepted << endl;
+      logfile << "REJECTED " << rejected << endl;
+
+      exit(1);
     }
   }
 }

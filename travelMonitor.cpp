@@ -188,16 +188,25 @@ int main(int argc, char **argv) {
               (dayReturned + 30 * monthReturend + 360 * yearReturned);
 
           if (distanceOfDates > 180) {
+            sentStringClient(fdList, "ACCEPTED", socketBufferSize, MonitorID);
+          } else {
+            sentStringClient(fdList, "REJECTED", socketBufferSize, MonitorID);
+          }
+          if (distanceOfDates > 180) {
+
             cout << "REQUEST REJECTED – YOU WILL NEED ANOTHER VACCINATION "
                     "BEFORE "
                     "TRAVEL DATE"
                  << endl;
           } else if (distanceOfDates >= 0) {
+            sentStringClient(fdList, "ACCEPTED", socketBufferSize, MonitorID);
             cout << " REQUEST ACCEPTED – HAPPY TRAVELS" << endl;
           } else {
+
             cout << " REQUEST REJECTED – YOU ARE NOT VACCINATED " << endl;
           }
         } else {
+
           cout << " REQUEST REJECTED - YOU ARE NOT VACCINATED " << endl;
         }
       }
@@ -206,7 +215,7 @@ int main(int argc, char **argv) {
     }
     case 2: {
       string secondCommand = "/travelStats";
-
+      cout << "I am sorry this command is not supported";
       break;
     }
     case 3: {
@@ -266,6 +275,10 @@ int main(int argc, char **argv) {
     }
     case 5: {
       string fifthCommand = "/exit";
+      for (int i = 0; i < numMonitors; i++) {
+        sentStringClient(fdList, fifthCommand, socketBufferSize, i);
+      }
+      exit(1);
     }
     }
   } while (true);
