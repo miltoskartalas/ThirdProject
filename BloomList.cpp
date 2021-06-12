@@ -9,12 +9,20 @@ BloomNode::BloomNode(string virusName, BloomFilter *filter) {
   this->next = nullptr;
 }
 
-BloomNode::~BloomNode(){};
+BloomNode::~BloomNode() { delete filter; };
 
 BloomList::BloomList() { this->start = nullptr; }
-BloomList::~BloomList(){
-    // to complete
-};
+BloomList::~BloomList() {
+
+  BloomNode *current = start;
+  BloomNode *temp;
+  while (current) {
+
+    temp = current->next;
+    delete current;
+    current = temp;
+  }
+}
 
 void BloomList::addBloomNode(string virusName, BloomFilter *filter) {
   BloomNode *current = start;

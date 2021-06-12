@@ -7,6 +7,7 @@
 #include "MonitorCountries.h"
 #include "Viruses.h"
 #include <dirent.h>
+#include <pthread.h>
 #include <string>
 
 #define PORT 7777
@@ -37,7 +38,9 @@ void sentCountriesDirectories(FileDescriptorList *fdList,
                               MonitorCountriesList *mCountriesList,
                               DIR *input_DIR, int numMonitors, int bufferSize);
 
-void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID, BloomList *BloomFilters, int bfSize, int sizeOfBloom);
+void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
+                                 BloomList *BloomFilters, int bfSize,
+                                 int sizeOfBloom);
 
 // Read/Send from Client
 string readStringClient(FileDescriptorList *fdList, int bufferSize, int MonID);
@@ -52,7 +55,8 @@ string readStringServer(int bufferSize, int sock);
 void sentIntServer(int integer, int sock);
 int readIntServer(int sock);
 
-void createThreads(int numThreads, threadInfo *threadArgs);
+void createThreads(int numThreads, threadInfo *threadArgs,
+                   pthread_t *threadArray);
 CountryList *pathsInDirectories(int numdirs, string *dirs);
 
 #endif

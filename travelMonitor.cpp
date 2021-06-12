@@ -278,6 +278,11 @@ int main(int argc, char **argv) {
       for (int i = 0; i < numMonitors; i++) {
         sentStringClient(fdList, fifthCommand, socketBufferSize, i);
       }
+      delete parser;
+      delete mCountriesList;
+      delete[] mPIDS;
+      delete BloomFilters;
+      // delete fdList;
       exit(1);
     }
     }

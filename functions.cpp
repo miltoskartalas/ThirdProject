@@ -467,9 +467,8 @@ void *threadFunction(void *args) {
   return nullptr;
 }
 
-void createThreads(int numThreads, threadInfo *threadArgs) {
-
-  threadArray = new pthread_t[numThreads];
+void createThreads(int numThreads, threadInfo *threadArgs,
+                   pthread_t *threadArray) {
 
   for (int i = 0; i < numThreads; i++) {
     if (pthread_create(&threadArray[i], nullptr, threadFunction, threadArgs) !=

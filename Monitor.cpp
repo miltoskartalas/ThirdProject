@@ -134,8 +134,10 @@ int main(int argc, char **argv) {
 
   // cout << "Finished buffer" << endl;
 
-  createThreads(numThreads, threadArgs);
+  pthread_t *threadArray = new pthread_t[numThreads];
+  createThreads(numThreads, threadArgs, threadArray);
 
+  // producer
   int completedPaths = 0;
   // giving to buffer the paths that it will need
   while (true) {
@@ -186,7 +188,8 @@ int main(int argc, char **argv) {
   //  waiting {for commands
   while (true) {
 
-    string commandRecieved = readStringServer(socketBufferSize, socketFromAcc);
+    string commandRecieved = "";
+    commandRecieved = readStringServer(socketBufferSize, socketFromAcc);
     string VirusNameRecieved = "";
     int citizenIDRecieved = 0;
     string answer = "";
@@ -292,7 +295,9 @@ int main(int argc, char **argv) {
     }
     if (commandRecieved == "/exit") {
       cout << "exiting.. " << endl;
-
+      for (int i = 0; i < numThreads; i++) {
+        pthread_join(threadArray[i], NULL);
+      }
       string logFile = "logfiles/log_file." + to_string(getpid());
       ofstream logfile;
       logfile.open(logFile);
@@ -306,6 +311,16 @@ int main(int argc, char **argv) {
       logfile << "ACCEPTED " << accepted << endl;
       logfile << "REJECTED " << rejected << endl;
 
+      delete citizensList;
+      delete threadArgs;
+      delete citizensList;
+      delete virusesList;
+      delete countriesList;
+
+      delete[] paths;
+      delete[] allCountryPaths;
+
+      delete buffer;
       exit(1);
     }
   }
