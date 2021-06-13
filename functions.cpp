@@ -148,104 +148,110 @@ pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
   }
 }
 
-void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
-                          int bufferSize, int sizeOfBloom, int numOfCountries,
-                          int numMonitors, string input_dir) {
-  int writeFileDescriptor = (fdList->getFileDescriptor(monitorIndex));
+// void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
+//                           int bufferSize, int sizeOfBloom, int
+//                           numOfCountries, int numMonitors, string input_dir)
+//                           {
+//   int writeFileDescriptor = (fdList->getFileDescriptor(monitorIndex));
 
-  // cout << "TravelMonitor sending bufferSize to mon " << i << endl;
-  int transferBufferSize = bufferSize;
-  if (send(writeFileDescriptor, &transferBufferSize, sizeof(int), 0) == -1) {
-    perror(" Couldnt sent bufferSize");
-  }
-  int transferSizeOfBloom = sizeOfBloom;
+//   // cout << "TravelMonitor sending bufferSize to mon " << i << endl;
+//   int transferBufferSize = bufferSize;
+//   if (send(writeFileDescriptor, &transferBufferSize, sizeof(int), 0) == -1) {
+//     perror(" Couldnt sent bufferSize");
+//   }
+//   int transferSizeOfBloom = sizeOfBloom;
 
-  if (send(writeFileDescriptor, &transferSizeOfBloom, sizeof(int), 0) == -1) {
-    perror(" Couldnt sent sizeOfBloom");
-  }
-  // round robin
-  int countriesPerMonitor = 0;
-  if (monitorIndex < numOfCountries % numMonitors) {
-    countriesPerMonitor = numOfCountries / numMonitors + 1;
-  } else {
-    countriesPerMonitor = numOfCountries / numMonitors;
-  }
-  if (send(writeFileDescriptor, &countriesPerMonitor, sizeof(int), 0) == -1) {
-    perror(" Couldnt sent countries per monitor");
-  }
+//   if (send(writeFileDescriptor, &transferSizeOfBloom, sizeof(int), 0) == -1)
+//   {
+//     perror(" Couldnt sent sizeOfBloom");
+//   }
+//   // round robin
+//   int countriesPerMonitor = 0;
+//   if (monitorIndex < numOfCountries % numMonitors) {
+//     countriesPerMonitor = numOfCountries / numMonitors + 1;
+//   } else {
+//     countriesPerMonitor = numOfCountries / numMonitors;
+//   }
+//   if (send(writeFileDescriptor, &countriesPerMonitor, sizeof(int), 0) == -1)
+//   {
+//     perror(" Couldnt sent countries per monitor");
+//   }
 
-  const char *sentInputDirectory = input_dir.c_str();
-  int sizeOfsentDirectory = strlen(sentInputDirectory);
+//   const char *sentInputDirectory = input_dir.c_str();
+//   int sizeOfsentDirectory = strlen(sentInputDirectory);
 
-  if (send(writeFileDescriptor, &sizeOfsentDirectory, sizeof(int), 0) == -1)
-    perror("Error writting to pipe size input_dir");
+//   if (send(writeFileDescriptor, &sizeOfsentDirectory, sizeof(int), 0) == -1)
+//     perror("Error writting to pipe size input_dir");
 
-  int ptr = 0;
-  int transferSize = bufferSize;
-  if (bufferSize > sizeOfsentDirectory) {
-    transferSize = sizeOfsentDirectory;
-  }
-  // creating list that will keep which countries each monitor has
-  for (int i = 0; i <= sizeOfsentDirectory / bufferSize; i++) {
-    if (i == sizeOfsentDirectory / bufferSize) {
-      transferSize = sizeOfsentDirectory % bufferSize;
-    }
-    if (send(writeFileDescriptor, &sentInputDirectory[ptr], transferSize, 0) ==
-        -1) {
-      perror("Error writing to pipe input_dir ");
-    }
-    ptr += bufferSize;
-  }
-}
+//   int ptr = 0;
+//   int transferSize = bufferSize;
+//   if (bufferSize > sizeOfsentDirectory) {
+//     transferSize = sizeOfsentDirectory;
+//   }
+//   // creating list that will keep which countries each monitor has
+//   for (int i = 0; i <= sizeOfsentDirectory / bufferSize; i++) {
+//     if (i == sizeOfsentDirectory / bufferSize) {
+//       transferSize = sizeOfsentDirectory % bufferSize;
+//     }
+//     if (send(writeFileDescriptor, &sentInputDirectory[ptr], transferSize, 0)
+//     ==
+//         -1) {
+//       perror("Error writing to pipe input_dir ");
+//     }
+//     ptr += bufferSize;
+//   }
+// }
 
 // function that sends  directories to each monitor
 
-void sentCountriesDirectories(FileDescriptorList *fdList,
-                              MonitorCountriesList *mCountriesList,
-                              DIR *input_DIR, int numMonitors, int bufferSize) {
-  struct dirent *country;
-  int monitorIndexRound = 0;
-  while ((country = readdir(input_DIR))) {
-    if (!strcmp(country->d_name, ".") || !strcmp(country->d_name, "..")) {
-      continue; // ignore dots
-    }
-    if (country->d_type == DT_DIR) {
-      // file is a directory
-      if (monitorIndexRound % numMonitors == 0)
-        monitorIndexRound = 0; // reset index for round robin
+// void sentCountriesDirectories(FileDescriptorList *fdList,
+//                               MonitorCountriesList *mCountriesList,
+//                               DIR *input_DIR, int numMonitors, int
+//                               bufferSize) {
+//   struct dirent *country;
+//   int monitorIndexRound = 0;
+//   while ((country = readdir(input_DIR))) {
+//     if (!strcmp(country->d_name, ".") || !strcmp(country->d_name, "..")) {
+//       continue; // ignore dots
+//     }
+//     if (country->d_type == DT_DIR) {
+//       // file is a directory
+//       if (monitorIndexRound % numMonitors == 0)
+//         monitorIndexRound = 0; // reset index for round robin
 
-      int writeFileDescriptor = fdList->getFileDescriptor(monitorIndexRound);
-      mCountriesList->addMonitorCountryNode(country->d_name, monitorIndexRound);
-      monitorIndexRound++;
+//       int writeFileDescriptor = fdList->getFileDescriptor(monitorIndexRound);
+//       mCountriesList->addMonitorCountryNode(country->d_name,
+//       monitorIndexRound); monitorIndexRound++;
 
-      string directory = country->d_name;
-      //  cout << "first " << directory << endl;
-      const char *sentDirectory = directory.c_str();
-      int sizeOfsentDirectory = strlen(sentDirectory);
+//       string directory = country->d_name;
+//       //  cout << "first " << directory << endl;
+//       const char *sentDirectory = directory.c_str();
+//       int sizeOfsentDirectory = strlen(sentDirectory);
 
-      if (send(writeFileDescriptor, &sizeOfsentDirectory, sizeof(int), 0) ==
-          -1) {
-        perror("Error writting to pipe size of country");
-      }
-      // cout << "SUCCESSFUL WRITE " << endl;
-      int ptr = 0;
-      int transferSize = bufferSize;
-      if (bufferSize > strlen(sentDirectory)) {
-        transferSize = strlen(sentDirectory);
-      }
-      for (int j = 0; j <= strlen(sentDirectory) / bufferSize; j++) {
-        // cout << "second " << sentDirectory[ptr] << endl;
-        if (j == strlen(sentDirectory) / bufferSize) {
-          transferSize = strlen(sentDirectory) % bufferSize;
-        } // NA TO TSEKARW
-        if (send(writeFileDescriptor, &sentDirectory[ptr], transferSize, 0) ==
-            -1)
-          perror("Error writing to pipe name of country ");
-        ptr += bufferSize;
-      }
-    }
-  }
-}
+//       if (send(writeFileDescriptor, &sizeOfsentDirectory, sizeof(int), 0) ==
+//           -1) {
+//         perror("Error writting to pipe size of country");
+//       }
+//       // cout << "SUCCESSFUL WRITE " << endl;
+//       int ptr = 0;
+//       int transferSize = bufferSize;
+//       if (bufferSize > strlen(sentDirectory)) {
+//         transferSize = strlen(sentDirectory);
+//       }
+//       for (int j = 0; j <= strlen(sentDirectory) / bufferSize; j++) {
+//         // cout << "second " << sentDirectory[ptr] << endl;
+//         if (j == strlen(sentDirectory) / bufferSize) {
+//           transferSize = strlen(sentDirectory) % bufferSize;
+//         } // NA TO TSEKARW
+//         if (send(writeFileDescriptor, &sentDirectory[ptr], transferSize, 0)
+//         ==
+//             -1)
+//           perror("Error writing to pipe name of country ");
+//         ptr += bufferSize;
+//       }
+//     }
+//   }
+// }
 // function that read bloom filters when they are ready to be send by monitors
 void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
                                  BloomList *BloomFilters, int bfSize,

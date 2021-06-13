@@ -31,12 +31,13 @@ pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
                      int numThreads, int socketBufferSize, int cyclicBufferSize,
                      int sizeOfBloom, MonitorCountriesList *mCountriesList,
                      int numOfCountries, string input_dir);
-void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
-                          int bufferSize, int sizeOfBloom, int numOfCountries,
-                          int numMonitors, string input_dir);
-void sentCountriesDirectories(FileDescriptorList *fdList,
-                              MonitorCountriesList *mCountriesList,
-                              DIR *input_DIR, int numMonitors, int bufferSize);
+// void sentInitializingData(FileDescriptorList *fdList, int monitorIndex,
+//                           int bufferSize, int sizeOfBloom, int
+//                           numOfCountries, int numMonitors, string input_dir);
+// void sentCountriesDirectories(FileDescriptorList *fdList,
+//                               MonitorCountriesList *mCountriesList,
+//                               DIR *input_DIR, int numMonitors, int
+//                               bufferSize);
 
 void readBloomFiltersFromMonitor(FileDescriptorList *fdList, int monID,
                                  BloomList *BloomFilters, int bfSize,
