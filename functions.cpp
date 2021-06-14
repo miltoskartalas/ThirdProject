@@ -84,36 +84,41 @@ void addTofile(string fileName, CountryList **countriesList,
   }
 }
 
-pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
+pid_t createMonitors(int monitorIndex, struct dirent **test, int numMonitors,
                      int numThreads, int socketBufferSize, int cyclicBufferSize,
                      int sizeOfBloom, MonitorCountriesList *mCountriesList,
                      int numOfCountries, string input_dir) {
   // Find countries for monitor
   struct dirent *country;
   int monitorIndexRound = 0;
-
-  while ((country = readdir(input_DIR))) {
-    if (!strcmp(country->d_name, ".") || !strcmp(country->d_name, "..")) {
+  int count = 0;
+  while ((count < numOfCountries)) {
+    if (!strcmp(test[count]->d_name, ".") ||
+        !strcmp(test[count]->d_name, "..")) {
+      count++;
       continue; // ignore dots
     }
-    if (country->d_type == DT_DIR) {
+
+    if (test[count]->d_type == DT_DIR) {
       // file is a directory
       if (monitorIndexRound % numMonitors == 0)
         monitorIndexRound = 0; // reset index for round robin
 
-      string directory = country->d_name;
+      string directory = test[count]->d_name;
 
       if (monitorIndex == monitorIndexRound) {
 
-        mCountriesList->addMonitorCountryNode(input_dir + "/" + country->d_name,
-                                              monitorIndexRound);
+        mCountriesList->addMonitorCountryNode(
+            input_dir + "/" + test[count]->d_name, monitorIndexRound);
       }
       monitorIndexRound++;
     }
+    count++;
   }
-  rewinddir(input_DIR);
+
   string *paths = mCountriesList->getCountriesByMonitorIndex(monitorIndex);
   int numPaths = mCountriesList->getNumCountriesOfMonitor(monitorIndex);
+
   pid_t childpid;
   if ((childpid = fork()) < 0) {
     perror("Couldn't create Monitor");
@@ -141,9 +146,12 @@ pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
       i++;
     }
     arguments[5 + numPaths] = NULL;
+
     execvp("./monitorServer", (char **)arguments);
     exit(EXIT_SUCCESS);
   } else {
+
+    delete[] paths;
     return childpid;
   }
 }

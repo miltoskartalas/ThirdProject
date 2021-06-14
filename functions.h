@@ -27,7 +27,7 @@ void addTofile(string fileName, CountryList **countries,
                VirusList **virusesList, CitizenList **citizensList,
                int bloomSize);
 
-pid_t createMonitors(int monitorIndex, DIR *input_DIR, int numMonitors,
+pid_t createMonitors(int monitorIndex, struct dirent **test, int numMonitors,
                      int numThreads, int socketBufferSize, int cyclicBufferSize,
                      int sizeOfBloom, MonitorCountriesList *mCountriesList,
                      int numOfCountries, string input_dir);

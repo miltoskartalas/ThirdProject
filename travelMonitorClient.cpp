@@ -32,45 +32,19 @@ int main(int argc, char **argv) {
   int socketBufferSize = atoi(argv[4]);
   int cyclicBufferSize = atoi(argv[6]);
   int sizeOfBloom = atoi(argv[8]);
-
+  struct dirent **test;
   string input_dir = argv[10];
   int numThreads = atoi(argv[12]);
-  DIR *input_DIR = opendir(argv[10]); // Open input directory
+  int numOfCountries =
+      scandir(argv[10], &test, NULL, alphasort); // Open input directory
 
-  if (ENOENT == errno) {
-    perror("Couldn't open input directory");
-    exit(EXIT_FAILURE);
-  }
-  struct dirent *emptyDir;
-  bool isEmpty = true;
-  while ((emptyDir = readdir(input_DIR)) &&
-         (strcmp(emptyDir->d_name, ".") || strcmp(emptyDir->d_name, ".."))) {
-    isEmpty = false;
-  }
-  rewinddir(input_DIR);
-  if (isEmpty) {
-    errno = ENOENT;
-    perror("Input directory is empty");
-    exit(EX_USAGE);
-  }
-  // Count number of countries
-  struct dirent *counter;
-  int numOfCountries = 0;
-  while ((counter = readdir(input_DIR)) != NULL) {
-    if ((!strcmp(counter->d_name, ".") || !strcmp(counter->d_name, ".."))) {
-      continue;
-    }
-    if (counter->d_type == DT_DIR) {
-      numOfCountries++;
-    }
-  }
-
-  rewinddir(input_DIR);
+  numOfCountries = numOfCountries - 2;
   FileDescriptorList *fdList = new FileDescriptorList();
   int *mPIDS = new int[numMonitors];
   MonitorCountriesList *mCountriesList = new MonitorCountriesList();
+
   for (int i = 0; i < numMonitors; i++) {
-    mPIDS[i] = createMonitors(i, input_DIR, numMonitors, numThreads,
+    mPIDS[i] = createMonitors(i, test, numMonitors, numThreads,
                               socketBufferSize, cyclicBufferSize, sizeOfBloom,
                               mCountriesList, numOfCountries, input_dir);
   }
